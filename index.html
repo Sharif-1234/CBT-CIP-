@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EventLitez</title>
+   <style>
+    
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 20px;
+        padding: 0;
+        background-color: rgb(216, 231, 231);
+      }
+      .container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(168, 59, 59, 0.1)
+      }
+      input,button{
+        width: 100px;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .event-list{
+        margin-top: 20px;
+
+      }
+      .event-item{
+        background-color: rgb(171, 72, 92);
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+      }
+
+   </style>
+  </head>
+  <nav>EventLitez</nav>
+  <body>
+    <div class="container">
+      
+      <h2>Create an Event</h2>
+      <form id="eventForm">
+      <input type="text" id="eventName" placeholder="Event Name" required/>
+      <input type="date" id="eventDate" placeholder="Event Date" required/>
+      <input type="time" id="eventTime" placeholder="Event Time" required/>
+      <input type="text" id="eventLocation" placeholder="Event Location" required/>
+      <button type="submit">Add Event</button>
+    </form>
+      <h2>upcoming Events</h2>
+      <ul id="eventlist"></ul>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+  const eventForm = document.getElementById("eventForm");
+  const eventList = document.getElementById("eventlist");
+
+
+  function loadEvents() {
+    eventList.innerHTML = ""; 
+    const events = JSON.parse(localStorage.getItem("events")) || [];
+
+    events.forEach((event, index) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${event.name}</strong> - ${event.date} at ${event.time} <br> 
+        Location: ${event.location} 
+        <button class="delete-btn" data-index="${index}">Delete</button>
+      `;
+      eventList.appendChild(li);
+    });
+  }
+
+  
+  eventForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const eventName = document.getElementById("eventName").value;
+    const eventDate = document.getElementById("eventDate").value;
+    const eventTime = document.getElementById("eventTime").value;
+    const eventLocation = document.getElementById("eventLocation").value;
+
+    if (!eventName || !eventDate || !eventTime || !eventLocation) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    const newEvent = {
+      name: eventName,
+      date: eventDate,
+      time: eventTime,
+      location: eventLocation,
+    };
+
+    const events = JSON.parse(localStorage.getItem("events")) || [];
+    events.push(newEvent);
+    localStorage.setItem("events", JSON.stringify(events));
+
+    eventForm.reset();
+    loadEvents(); 
+  });
+
+ 
+  eventList.addEventListener("click", function (e) {
+    if (e.target.classList.contains("delete-btn")) {
+      const index = e.target.getAttribute("data-index");
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+      events.splice(index, 1);
+      localStorage.setItem("events", JSON.stringify(events));
+      loadEvents();
+    }
+  });
+
+  
+  loadEvents();
+});
+
+    </script>
+  </body>
+</html>
